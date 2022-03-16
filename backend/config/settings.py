@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.templating import Jinja2Templates
 from fastapi_mail import ConnectionConfig, FastMail
 from pydantic import EmailStr
 
@@ -11,7 +12,6 @@ BASE_DIR = Path(__file__).parent.parent.parent
 
 DOTENV_PATH = ".env"
 load_dotenv(dotenv_path=os.path.join(BASE_DIR, DOTENV_PATH))
-
 
 APP_NAME = "JIRA Analog"
 APP_VERSION = "0.0.1beta"
@@ -45,3 +45,6 @@ conf = ConnectionConfig(
 )
 
 fm = FastMail(conf)
+
+
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates/"))

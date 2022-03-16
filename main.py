@@ -1,13 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from fastapi_pagination import add_pagination
+from starlette.responses import HTMLResponse
 from tortoise.contrib.fastapi import register_tortoise
 
 from backend.config import settings
+from backend.config.settings import templates
 from backend.config.tortoise_conf import TORTOISE_ORM
 from backend.core.urls import register_views
 
 app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
