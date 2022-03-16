@@ -14,6 +14,12 @@ app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
