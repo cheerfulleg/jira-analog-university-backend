@@ -28,6 +28,9 @@ async def create_user(new_user: UserCreate_Pydantic):
 
 @user_router.post("/reset-password")
 async def request_reset_password(email: str, background_tasks: BackgroundTasks):
+    """
+    Sends email to change user password
+    """
     user = await User.get(email=email)
     payload = {"id": user.id}
     reset_token = auth_jwt.create_access_token(payload)
@@ -53,12 +56,18 @@ async def get_user_profile(user: User = Depends(current_user)):
 
 @user_router.get("/reset-password/{token}", response_class=HTMLResponse)
 async def reset_password_get(request: Request, token: str):
+    """
+    Renders "reset password page"
+    """
     auth_jwt.decode_token(token)
     return templates.TemplateResponse("reset-password.html", {"request": request})
 
 
 @user_router.post("/reset-password/{token}", response_class=HTMLResponse)
 async def reset_password_post(request: Request, token: str, password: str = Form(...)):
+    """
+    Takes new password from form, sets new one and renders success page
+    """
     payload = auth_jwt.decode_token(token)
     password_hash = User.create_password_hash(password)
     await User.filter(id=payload.get("id")).update(password=password_hash)
