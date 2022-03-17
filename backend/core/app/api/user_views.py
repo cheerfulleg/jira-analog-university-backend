@@ -5,7 +5,7 @@ from starlette.responses import JSONResponse, HTMLResponse
 
 from backend.config.settings import fm, templates
 from backend.core.app.models import User
-from backend.core.app.schemas import User_Pydantic, UserCreate_Pydantic
+from backend.core.app.schemas import User_Pydantic, UserCreate_Pydantic, ResetPassword
 from backend.core.auth.jwt import auth_jwt
 from backend.core.auth.permissions import current_user
 
@@ -69,6 +69,7 @@ async def reset_password_post(request: Request, token: str, password: str = Form
     Takes new password from form, sets new one and renders success page
     """
     payload = auth_jwt.decode_token(token)
-    password_hash = User.create_password_hash(password)
+    validated_password = ResetPassword(password=password).password
+    password_hash = User.create_password_hash(validated_password)
     await User.filter(id=payload.get("id")).update(password=password_hash)
     return templates.TemplateResponse("reset-password-success.html", {"request": request})
