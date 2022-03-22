@@ -16,6 +16,6 @@ async def is_team_member(project_id: int, user: User = Depends(current_user)) ->
     if team_member := await TeamMember.filter(project_id=project_id, user_id=user.id).first():
         return team_member
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Not found",
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Not permitted",
     )
