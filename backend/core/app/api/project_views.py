@@ -1,7 +1,14 @@
 from fastapi import APIRouter, Depends
 
 from backend.core.app.models import Project, User, TeamMember, Column, Task
-from backend.core.app.schemas import Project_Pydantic, ProjectCreate, TeamMemberCreate, ColumnCreate, TaskCreate
+from backend.core.app.schemas import (
+    Project_Pydantic,
+    ProjectCreate,
+    TeamMemberCreate,
+    ColumnCreate,
+    TaskCreate,
+    TaskUpdate,
+)
 from backend.core.auth.permissions import current_user, is_team_member
 
 project_router = APIRouter()
@@ -26,7 +33,7 @@ async def create_project(project: ProjectCreate, user: User = Depends(current_us
 
 @project_router.get("/{project_id}", response_model=Project_Pydantic)
 async def get_project_detail(project_id: int, user: User = Depends(current_user)):
-    return await Project_Pydantic.from_tortoise_orm(Project.get(id=project_id))
+    return await Project_Pydantic.from_queryset_single(Project.get(id=project_id))
 
 
 @project_router.post("/{project_id}/add-member", response_model=Project_Pydantic)
@@ -50,4 +57,12 @@ async def create_project_column_task(
     project_id: int, column_id: int, task: TaskCreate, team_member: TeamMember = Depends(is_team_member)
 ):
     await Task.create(**task.dict(), column_id=column_id)
+    return await Project_Pydantic.from_queryset_single(Project.get(id=project_id))
+
+
+@project_router.patch("/{project_id}/task/{task_id}", response_model=Project_Pydantic)
+async def update_project_column_task(
+    project_id: int, task_id: int, task: TaskUpdate, team_member: TeamMember = Depends(is_team_member)
+):
+    await Task.filter(id=task_id).update(**task.dict(exclude_unset=True))
     return await Project_Pydantic.from_queryset_single(Project.get(id=project_id))

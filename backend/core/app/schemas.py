@@ -72,3 +72,11 @@ class TaskCreate(PydanticModel):
 
     class Config:
         title = "TaskCreate"
+
+
+class TaskUpdate(TaskCreate):
+    name: Optional[str]
+    column_id: int = Field(...)
+
+    class Config:
+        title = "TaskUpdate"
