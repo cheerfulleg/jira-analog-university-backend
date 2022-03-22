@@ -1,7 +1,9 @@
-from pydantic import BaseModel, EmailStr, Field, ValidationError, validator
+from typing import Optional
+
+from pydantic import BaseModel, EmailStr, Field, validator
 from tortoise.contrib.pydantic import pydantic_model_creator, PydanticModel
 
-from backend.core.app.models import User
+from backend.core.app.models import User, Project, TeamMember
 
 User_Pydantic = pydantic_model_creator(User, name="User")
 
@@ -33,3 +35,25 @@ class UserCreate_Pydantic(BaseUser, PasswordMixin):
 
 class ResetPassword(PasswordMixin):
     pass
+
+
+Project_Pydantic = pydantic_model_creator(Project, name="Project")
+
+
+class ProjectCreate(PydanticModel):
+    name: str = Field(...)
+    description: Optional[str]
+
+    class Config:
+        title = "ProjectCreate"
+
+
+TeamMember_Pydantic = pydantic_model_creator(TeamMember, name="TeamMember")
+
+
+class TeamMemberCreate(PydanticModel):
+    user_id: int = Field(...)
+    role: Optional[str]
+
+    class Config:
+        title = "TeamMemberCreate"
