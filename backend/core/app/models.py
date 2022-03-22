@@ -41,8 +41,11 @@ class TeamMember(Model):
     project = fields.ForeignKeyField("models.Project", related_name="team_members")
     role = fields.CharField(100, null=True, default=None)
 
+    assigned_to: fields.ReverseRelation["Task"]
+
     class PydanticMeta:
         unique_together = (("project", "user"),)
+        exclude = ("project", "project_id", "assigned_to")
 
 
 class Project(Model):
@@ -62,12 +65,23 @@ class Column(Model):
     name = fields.CharField(50)
     project = fields.ForeignKeyField("models.Project", related_name="columns")
 
+    def __str__(self):
+        return self.name
+
 
 class Task(Model):
     id = fields.IntField(pk=True, index=True)
     name = fields.CharField(150)
     description = fields.TextField(null=True, default=None)
     column = fields.ForeignKeyField("models.Column", related_name="tasks")
+
+    assignee = fields.ForeignKeyField("models.TeamMember", related_name="assigned_to", null=True, default=None)
+
+    class PydanticMeta:
+        exclude = ("assignee__project",)
+
+    def __str__(self):
+        return self.name
 
 
 Tortoise.init_models(["backend.core.app.models"], "models")

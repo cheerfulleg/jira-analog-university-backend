@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field, validator
 from tortoise.contrib.pydantic import pydantic_model_creator, PydanticModel
 
-from backend.core.app.models import User, Project, TeamMember
+from backend.core.app.models import User, Project, TeamMember, Task
 
 User_Pydantic = pydantic_model_creator(User, name="User")
 
@@ -37,7 +37,7 @@ class ResetPassword(PasswordMixin):
     pass
 
 
-Project_Pydantic = pydantic_model_creator(Project, name="Project")
+Project_Pydantic = pydantic_model_creator(Project, name="Project", exclude=("team_members__assigned_to",))
 
 
 class ProjectCreate(PydanticModel):
@@ -48,7 +48,7 @@ class ProjectCreate(PydanticModel):
         title = "ProjectCreate"
 
 
-TeamMember_Pydantic = pydantic_model_creator(TeamMember, name="TeamMember")
+TeamMember_Pydantic = pydantic_model_creator(TeamMember, name="TeamMember", exclude=("project", "assigned_to"))
 
 
 class TeamMemberCreate(PydanticModel):
@@ -66,6 +66,9 @@ class ColumnCreate(PydanticModel):
         title = "ColumnCreate"
 
 
+Task_Pydantic = pydantic_model_creator(Task, name="Task", exclude=("column", "column_id", "assignee__project"))
+
+
 class TaskCreate(PydanticModel):
     name: str = Field(...)
     description: Optional[str]
@@ -80,3 +83,10 @@ class TaskUpdate(TaskCreate):
 
     class Config:
         title = "TaskUpdate"
+
+
+class TaskAssign(PydanticModel):
+    assignee_id: int = Field(...)
+
+    class Config:
+        title = "TaskAssign"

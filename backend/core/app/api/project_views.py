@@ -8,6 +8,9 @@ from backend.core.app.schemas import (
     ColumnCreate,
     TaskCreate,
     TaskUpdate,
+    TaskAssign,
+    TeamMember_Pydantic,
+    Task_Pydantic,
 )
 from backend.core.auth.permissions import current_user, is_team_member
 
@@ -66,3 +69,21 @@ async def update_project_column_task(
 ):
     await Task.filter(id=task_id).update(**task.dict(exclude_unset=True))
     return await Project_Pydantic.from_queryset_single(Project.get(id=project_id))
+
+
+@project_router.get("/{project_id}/team-members", response_model=list[TeamMember_Pydantic])
+async def get_project_team_members_list(project_id: int, team_member: TeamMember = Depends(is_team_member)):
+    return await TeamMember_Pydantic.from_queryset(TeamMember.filter(project_id=project_id))
+
+
+@project_router.patch("/{project_id}/task/{task_id}/assign", response_model=Project_Pydantic)
+async def assign_task_to_member(
+    project_id: int, task_id: int, assignee: TaskAssign, team_member: TeamMember = Depends(is_team_member)
+):
+    await Task.filter(id=task_id).update(**assignee.dict())
+    return await Project_Pydantic.from_queryset_single(Project.get(id=project_id))
+
+
+@project_router.get("/{project_id}/task/{task_id}", response_model=Task_Pydantic)
+async def get_task_detail(project_id: int, task_id: int, team_member: TeamMember = Depends(is_team_member)):
+    return await Task_Pydantic.from_queryset_single(Task.get(id=task_id))
