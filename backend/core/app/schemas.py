@@ -5,7 +5,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator, PydanticModel
 
 from backend.core.app.models import User, Project, TeamMember, Task
 
-User_Pydantic = pydantic_model_creator(User, name="User")
+User_Pydantic = pydantic_model_creator(User, name="User", exclude=("team_member",))
 
 
 class PasswordMixin(BaseModel):
