@@ -63,4 +63,11 @@ class Column(Model):
     project = fields.ForeignKeyField("models.Project", related_name="columns")
 
 
+class Task(Model):
+    id = fields.IntField(pk=True, index=True)
+    name = fields.CharField(150)
+    description = fields.TextField(null=True, default=None)
+    column = fields.ForeignKeyField("models.Column", related_name="tasks")
+
+
 Tortoise.init_models(["backend.core.app.models"], "models")

@@ -64,3 +64,11 @@ class ColumnCreate(PydanticModel):
 
     class Config:
         title = "ColumnCreate"
+
+
+class TaskCreate(PydanticModel):
+    name: str = Field(...)
+    description: Optional[str]
+
+    class Config:
+        title = "TaskCreate"
