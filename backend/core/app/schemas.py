@@ -57,3 +57,10 @@ class TeamMemberCreate(PydanticModel):
 
     class Config:
         title = "TeamMemberCreate"
+
+
+class ColumnCreate(PydanticModel):
+    name: str = Field(...)
+
+    class Config:
+        title = "ColumnCreate"

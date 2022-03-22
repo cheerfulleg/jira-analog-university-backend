@@ -49,10 +49,18 @@ class Project(Model):
     id = fields.IntField(pk=True, index=True)
     name = fields.CharField(250)
     description = fields.TextField(null=True, default=None)
+
     team_members: fields.ReverseRelation["TeamMember"]
+    columns: fields.ReverseRelation["Column"]
 
     def __str__(self):
         return self.name
+
+
+class Column(Model):
+    id = fields.IntField(pk=True, index=True)
+    name = fields.CharField(50)
+    project = fields.ForeignKeyField("models.Project", related_name="columns")
 
 
 Tortoise.init_models(["backend.core.app.models"], "models")
