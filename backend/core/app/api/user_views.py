@@ -73,3 +73,8 @@ async def reset_password_post(request: Request, token: str, password: str = Form
     password_hash = User.create_password_hash(validated_password)
     await User.filter(id=payload.get("id")).update(password=password_hash)
     return templates.TemplateResponse("reset-password-success.html", {"request": request})
+
+
+@user_router.get("s", response_model=list[User_Pydantic])
+async def get_all_users_list(user: User = Depends(current_user)):
+    return await User_Pydantic.from_queryset(User.all())
