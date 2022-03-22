@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from backend.core.app.models import Project, User, TeamMember
-from backend.core.app.schemas import Project_Pydantic, ProjectCreate, TeamMemberCreate
+from backend.core.app.models import Project, User, TeamMember, Column
+from backend.core.app.schemas import Project_Pydantic, ProjectCreate, TeamMemberCreate, ColumnCreate
 from backend.core.auth.permissions import current_user, is_team_member
 
 project_router = APIRouter()
@@ -34,4 +34,12 @@ async def add_team_member(
     project_id: int, new_team_member: TeamMemberCreate, team_member: TeamMember = Depends(is_team_member)
 ):
     await TeamMember.create(**new_team_member.dict(), project_id=project_id)
+    return await Project_Pydantic.from_queryset_single(Project.get(id=project_id))
+
+
+@project_router.post("/{project_id}/column", response_model=Project_Pydantic)
+async def create_project_column(
+    project_id: int, column: ColumnCreate, team_member: TeamMember = Depends(is_team_member)
+):
+    await Column.create(**column.dict(), project_id=project_id)
     return await Project_Pydantic.from_queryset_single(Project.get(id=project_id))
