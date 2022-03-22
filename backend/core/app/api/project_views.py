@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends
+from fastapi_mail import MessageSchema
+from starlette.background import BackgroundTasks
 
+from backend.config.settings import fm
 from backend.core.app.models import Project, User, TeamMember, Column, Task
 from backend.core.app.schemas import (
     Project_Pydantic,
@@ -78,9 +81,20 @@ async def get_project_team_members_list(project_id: int, team_member: TeamMember
 
 @project_router.patch("/{project_id}/task/{task_id}/assign", response_model=Project_Pydantic)
 async def assign_task_to_member(
-    project_id: int, task_id: int, assignee: TaskAssign, team_member: TeamMember = Depends(is_team_member)
+    project_id: int,
+    task_id: int,
+    assignee: TaskAssign,
+    background_tasks: BackgroundTasks,
+    team_member: TeamMember = Depends(is_team_member),
 ):
     await Task.filter(id=task_id).update(**assignee.dict())
+
+    html = "Check out your new Task"
+    member = await TeamMember.filter(assigned_to__in=[task_id]).first()
+    email = str(await member.user)
+    message = MessageSchema(subject="You was assigned to a new Task", recipients=[email], body=html, subtype="html")
+    background_tasks.add_task(fm.send_message, message)
+
     return await Project_Pydantic.from_queryset_single(Project.get(id=project_id))
 
 
