@@ -59,8 +59,15 @@ class TeamMemberCreate(PydanticModel):
         title = "TeamMemberCreate"
 
 
+class TeamMemberUpdate(PydanticModel):
+    role: str
+
+    class Config:
+        title = "TeamMemberUpdate"
+
+
 class ColumnCreate(PydanticModel):
-    name: str = Field(...)
+    title: str = Field(...)
 
     class Config:
         title = "ColumnCreate"
@@ -70,7 +77,7 @@ Task_Pydantic = pydantic_model_creator(Task, name="Task", exclude=("column", "co
 
 
 class TaskCreate(PydanticModel):
-    name: str = Field(...)
+    title: str = Field(...)
     description: Optional[str]
 
     class Config:
@@ -78,7 +85,7 @@ class TaskCreate(PydanticModel):
 
 
 class TaskUpdate(TaskCreate):
-    name: Optional[str]
+    title: Optional[str]
     column_id: int = Field(...)
 
     class Config:

@@ -62,18 +62,18 @@ class Project(Model):
 
 class Column(Model):
     id = fields.IntField(pk=True, index=True)
-    name = fields.CharField(50)
+    title = fields.CharField(50)
     project = fields.ForeignKeyField("models.Project", related_name="columns")
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 class Task(Model):
     id = fields.IntField(pk=True, index=True)
-    name = fields.CharField(150)
+    title = fields.CharField(150)
     description = fields.TextField(null=True, default=None)
-    column = fields.ForeignKeyField("models.Column", related_name="tasks")
+    column = fields.ForeignKeyField("models.Column", related_name="cards")
 
     assignee = fields.ForeignKeyField("models.TeamMember", related_name="assigned_to", null=True, default=None)
 
@@ -81,7 +81,7 @@ class Task(Model):
         exclude = ("assignee__project",)
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 Tortoise.init_models(["backend.core.app.models"], "models")
